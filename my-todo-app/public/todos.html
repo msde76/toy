@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your To-Dos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logout-container">
+            <a href="/auth/logout">
+                <button class="logout-button">Logout</button>
+            </a>
+        </div>
+
+        <h1>Your To-Dos</h1>
+
+        <form action="/todos" method="post">
+            <input type="text" name="task" placeholder="New task" required>
+            <button type="submit">Add Task</button>
+        </form>
+
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        // To-Do 목록을 가져와 화면에 표시
+        fetch('/todos')
+            .then(response => response.json())
+            .then(todos => {
+                const todoList = document.getElementById('todo-list');
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.textContent = todo.task;
+
+                    // 완료된 항목 표시
+                    if (todo.is_done) {
+                        li.classList.add('done');
+                    }
+
+                    // 완료 버튼 추가
+                    const doneButton = document.createElement('button');
+                    doneButton.textContent = 'Done';
+                    doneButton.onclick = function() {
+                        fetch('/todos/done', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'taskId=' + todo.id
+                        }).then(() => location.reload());
+                    };
+
+                    // 삭제 버튼 추가
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.style.backgroundColor = 'red';
+                    deleteButton.onclick = function() {
+                        fetch('/todos/delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'taskId=' + todo.id
+                        }).then(() => location.reload());
+                    };
+
+                    li.appendChild(doneButton);
+                    li.appendChild(deleteButton);
+
+                    todoList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>

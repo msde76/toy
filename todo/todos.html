@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your To-Dos</title>
+</head>
+<body>
+    <h1>Your To-Dos</h1>
+    <form action="/todos" method="post">
+        <input type="text" name="task" placeholder="New task" required>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <ul id="todo-list"></ul>
+
+    <script>
+        fetch('/todos')
+            .then(response => response.json())
+            .then(todos => {
+                const todoList = document.getElementById('todo-list');
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.textContent = todo.task + (todo.is_done ? ' (done)' : '');
+                    todoList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>
